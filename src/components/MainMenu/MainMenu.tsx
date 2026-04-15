@@ -15,6 +15,7 @@ import { useUiStateStore } from 'src/stores/uiStateStore';
 import { exportAsJSON, modelFromModelStore } from 'src/utils';
 import { useInitialDataManager } from 'src/hooks/useInitialDataManager';
 import { useModelStore } from 'src/stores/modelStore';
+import { useIsoflowHost } from 'src/context/IsoflowHostContext';
 import { MenuItem } from './MenuItem';
 
 export const MainMenu = () => {
@@ -28,9 +29,13 @@ export const MainMenu = () => {
   const mainMenuOptions = useUiStateStore((state) => {
     return state.mainMenuOptions;
   });
+  const activeViewId = useUiStateStore((state) => {
+    return state.view;
+  });
   const uiStateActions = useUiStateStore((state) => {
     return state.actions;
   });
+  const { mergeImportedJson } = useIsoflowHost();
   const initialDataManager = useInitialDataManager();
 
   const onToggleMenu = useCallback(
@@ -62,8 +67,25 @@ export const MainMenu = () => {
       const fileReader = new FileReader();
 
       fileReader.onload = async (e) => {
-        const modelData = JSON.parse(e.target?.result as string);
-        load(modelData);
+        try {
+          const parsed: unknown = JSON.parse(e.target?.result as string);
+          let dataToLoad =
+            mergeImportedJson && activeViewId
+              ? mergeImportedJson(parsed, {
+                  currentModel: model,
+                  activeViewId
+                })
+              : (parsed as Parameters<typeof load>[0]);
+          load(dataToLoad);
+        } catch (err) {
+          const message =
+            err instanceof SyntaxError
+              ? 'The file is not valid JSON.'
+              : err instanceof Error
+                ? err.message
+                : 'Failed to load the file.';
+          window.alert(message);
+        }
       };
       fileReader.readAsText(file);
 
@@ -72,7 +94,7 @@ export const MainMenu = () => {
 
     await fileInput.click();
     uiStateActions.setIsMainMenuOpen(false);
-  }, [uiStateActions, load]);
+  }, [uiStateActions, load, mergeImportedJson, activeViewId, model]);
 
   const onExportAsJSON = useCallback(async () => {
     exportAsJSON(model);

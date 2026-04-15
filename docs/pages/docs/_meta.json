@@ -4,5 +4,6 @@
     "quickstart": "Quick start",
     "isopacks": "Loading Isopacks",
     "api": "API",
+    "studio": "Studio (persistence)",
     "contributing": "Contributing"
 }

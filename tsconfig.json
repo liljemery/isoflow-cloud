@@ -17,7 +17,7 @@
     "skipLibCheck": true,
     "useUnknownInCatchVariables": false
   },
-  "exclude": ["node_modules", "./dist", "./docs"],
+  "exclude": ["node_modules", "./dist", "./docs", "./apps"],
   "include": [
     "**/*.ts",
     "**/*.tsx",

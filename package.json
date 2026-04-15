@@ -17,7 +17,11 @@
     "test": "jest",
     "lint": "tsc --noEmit && eslint ./src/**/* --ext .ts,.tsx",
     "lint:fix": "eslint --fix ./src/**/* --ext .ts,.tsx",
-    "docker:build": "webpack --config ./webpack/docker.config.js"
+    "docker:build": "webpack --config ./webpack/docker.config.js",
+    "dev:api": "npm run dev --prefix apps/api",
+    "dev:web": "npm run dev --prefix apps/web",
+    "build:web": "npm run build --prefix apps/web",
+    "build:api": "npm run build --prefix apps/api"
   },
   "devDependencies": {
     "@isoflow/isopacks": "^0.0.10",

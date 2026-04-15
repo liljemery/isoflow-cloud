@@ -7,10 +7,18 @@ export type InitialData = Model & {
   view?: string;
 };
 
+/** Transform raw JSON before load — used by hosts to merge into one view and keep project title. */
+export type MergeImportedJsonFn = (
+  imported: unknown,
+  ctx: { currentModel: Model; activeViewId: string }
+) => InitialData;
+
 export interface IsoflowProps {
   initialData?: InitialData;
   mainMenuOptions?: MainMenuOptions;
   onModelUpdated?: (Model: Model) => void;
+  /** When set, JSON import merges into the active view and can preserve project-level fields. */
+  mergeImportedJson?: MergeImportedJsonFn;
   width?: number | string;
   height?: number | string;
   enableDebugTools?: boolean;

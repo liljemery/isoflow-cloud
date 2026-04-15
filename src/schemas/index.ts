@@ -1,4 +1,5 @@
 export * from './model';
+export * from './modelPayload';
 export * from './colors';
 export * from './icons';
 export * from './modelItems';

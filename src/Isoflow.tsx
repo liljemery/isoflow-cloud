@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import { theme } from 'src/styles/theme';
@@ -12,6 +12,7 @@ import { UiOverlay } from 'src/components/UiOverlay/UiOverlay';
 import { UiStateProvider, useUiStateStore } from 'src/stores/uiStateStore';
 import { INITIAL_DATA, MAIN_MENU_OPTIONS } from 'src/config';
 import { useInitialDataManager } from 'src/hooks/useInitialDataManager';
+import { IsoflowHostProvider } from 'src/context/IsoflowHostContext';
 
 const App = ({
   initialData,
@@ -30,10 +31,14 @@ const App = ({
   const model = useModelStore((state) => {
     return modelFromModelStore(state);
   });
+  const notifyParentRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Avoid notifying on every parent re-render: `model` is a new object reference with the same data. */
+  const lastNotifiedModelJsonRef = useRef<string | null>(null);
 
   const { load } = initialDataManager;
 
   useEffect(() => {
+    lastNotifiedModelJsonRef.current = null;
     load({ ...INITIAL_DATA, ...initialData });
   }, [initialData, load]);
 
@@ -51,7 +56,26 @@ const App = ({
   useEffect(() => {
     if (!initialDataManager.isReady || !onModelUpdated) return;
 
-    onModelUpdated(model);
+    const json = JSON.stringify(model);
+    if (json === lastNotifiedModelJsonRef.current) {
+      return;
+    }
+
+    if (notifyParentRef.current) {
+      clearTimeout(notifyParentRef.current);
+    }
+    notifyParentRef.current = setTimeout(() => {
+      notifyParentRef.current = null;
+      lastNotifiedModelJsonRef.current = JSON.stringify(model);
+      onModelUpdated(model);
+    }, 400);
+
+    return () => {
+      if (notifyParentRef.current) {
+        clearTimeout(notifyParentRef.current);
+        notifyParentRef.current = null;
+      }
+    };
   }, [model, initialDataManager.isReady, onModelUpdated]);
 
   useEffect(() => {
@@ -80,12 +104,15 @@ const App = ({
 };
 
 export const Isoflow = (props: IsoflowProps) => {
+  const { mergeImportedJson, ...appProps } = props;
   return (
     <ThemeProvider theme={theme}>
       <ModelProvider>
         <SceneProvider>
           <UiStateProvider>
-            <App {...props} />
+            <IsoflowHostProvider mergeImportedJson={mergeImportedJson}>
+              <App {...appProps} />
+            </IsoflowHostProvider>
           </UiStateProvider>
         </SceneProvider>
       </ModelProvider>

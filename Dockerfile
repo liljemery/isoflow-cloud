@@ -1,29 +1,22 @@
-# Use the official Node.js runtime as the base image
-FROM node:21 as build
+FROM node:21 AS build
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install dependencies
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
 
-# Copy the entire application code to the container
+RUN pnpm install --frozen-lockfile
+
 COPY . .
 
-# Build the React app for production
-RUN npm run docker:build
+RUN pnpm run docker:build
 
-# Use Nginx as the production server
 FROM nginx:alpine
 
-# Copy the built React app to Nginx's web server directory
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Expose port 80 for the Nginx server
 EXPOSE 80
 
-# Start Nginx when the container runs
 CMD ["nginx", "-g", "daemon off;"]

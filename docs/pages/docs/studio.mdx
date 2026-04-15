@@ -1,0 +1,43 @@
+# Studio: API + web host
+
+The core `Isoflow` component stays free of network calls. This repository adds an optional **REST API** (`apps/api`) and a **host web app** (`apps/web`) that persist diagrams as projects (JSON `Model` in PostgreSQL), with JWT auth and UUID-addressed projects.
+
+## Run locally
+
+1. Start PostgreSQL (or use Docker):
+
+```bash
+docker compose up -d postgres
+```
+
+2. Configure the API (defaults match `docker compose`):
+
+- `DATABASE_URL` — default `postgresql://isoflow:isoflow@localhost:5432/isoflow`
+- `JWT_SECRET` — set in production
+- `PORT` — default `4000`
+
+3. Install and migrate:
+
+```bash
+cd apps/api && npm install && npx prisma migrate deploy && npm run dev
+```
+
+4. In another shell, run the web app (proxies `/api` → `http://localhost:4000`):
+
+```bash
+cd apps/web && npm install && npm run dev
+```
+
+Open `http://localhost:5173`, register, create a project, and edit. Saves are **debounced** (~900ms) with a **Save now** action and status text in the editor toolbar.
+
+## Docker
+
+`docker compose up api postgres` builds and runs the API against the bundled Postgres service. The original `isoflow` static demo service is unchanged (`isoflow` service on port 8080).
+
+## Integration pattern
+
+- Load: `GET /projects/:uuid` → pass `model` into `initialData` (e.g. `{ ...model, fitToView: true }`).
+- Save: `onModelUpdated(model)` → debounced `PATCH /projects/:uuid` with `{ model }`.
+- Public identifiers: **project `uuid`** in URLs and API; numeric `id` stays internal to the database.
+
+Structural validation on the server uses `modelPayloadSchema` from `src/schemas/modelPayload.ts` (Zod, without browser-only graph consistency checks from `validateModel`).

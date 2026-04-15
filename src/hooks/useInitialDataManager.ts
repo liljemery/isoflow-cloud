@@ -14,6 +14,17 @@ import { useView } from 'src/hooks/useView';
 import { useUiStateStore } from 'src/stores/uiStateStore';
 import { modelSchema } from 'src/schemas/model';
 
+const normalizeLoadedModel = (data: unknown): InitialData => {
+  const raw = data as InitialData;
+  if (!raw.views?.length) return raw;
+  const views = raw.views.map((v) => ({
+    ...v,
+    id: v.id ?? generateId()
+  }));
+  const view = raw.view ?? views[0]?.id;
+  return { ...raw, views, view };
+};
+
 export const useInitialDataManager = () => {
   const [isReady, setIsReady] = useState(false);
   const prevInitialData = useRef<InitialData>();
@@ -34,17 +45,18 @@ export const useInitialDataManager = () => {
 
       setIsReady(false);
 
-      const validationResult = modelSchema.safeParse(_initialData);
+      const initialData = normalizeLoadedModel(_initialData);
+      const validationResult = modelSchema.safeParse(initialData);
 
       if (!validationResult.success) {
-        // TODO: let's get better at reporting error messages here (starting with how we present them to users)
-        // - not in console but in a modal
-        console.log(validationResult.error.errors);
-        window.alert('There is an error in your model.');
+        const firstError = validationResult.error.errors[0]?.message;
+        window.alert(
+          firstError
+            ? `There is an error in your model: ${firstError}`
+            : 'There is an error in your model.'
+        );
         return;
       }
-
-      const initialData = _initialData;
 
       if (initialData.views.length === 0) {
         const updates = reducers.view({
