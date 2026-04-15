@@ -40,4 +40,4 @@ Open `http://localhost:5173`, register, create a project, and edit. Saves are **
 - Save: `onModelUpdated(model)` → debounced `PATCH /projects/:uuid` with `{ model }`.
 - Public identifiers: **project `uuid`** in URLs and API; numeric `id` stays internal to the database.
 
-Structural validation on the server uses `modelPayloadSchema` from `src/schemas/modelPayload.ts` (Zod, without browser-only graph consistency checks from `validateModel`).
+Structural validation on the server uses `modelPayloadSchema` from `src/schemas/modelPayload.ts` (Zod, without browser-only graph consistency checks from `validateModel`). Persisted data splits the diagram: **`projects.model`** stores the shared JSON (title, items, icons, colors, etc.) **without** an embedded `views` array, while **`project_views`** holds one row per view (`project_id` FK, `view_key` = Isoflow view id, `payload` = full view JSON, `sort_order` for ordering). `GET /projects/:uuid` still returns a single assembled `model` including `views` for the editor.

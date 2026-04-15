@@ -18,3 +18,13 @@ export const modelPayloadSchema = z.object({
   icons: iconsSchema,
   colors: colorsSchema
 });
+
+/** Persisted `projects.model` JSON: shared diagram data only (views live in `project_views`). */
+export const modelBasePayloadSchema = z.object({
+  version: z.string().max(10).optional(),
+  title: constrainedStrings.title,
+  description: constrainedStrings.description.optional(),
+  items: modelItemsSchema,
+  icons: iconsSchema,
+  colors: colorsSchema
+});
