@@ -3,7 +3,8 @@
 <h4 align="center">
   <a href="https://codesandbox.io/p/sandbox/github/markmanx/isoflow">Online playground</a> |
   <a href="https://isoflow.io/docs">Developer docs</a> |
-  <a href="https://github.com/markmanx/isoflow">Github</a> |
+  <a href="https://github.com/markmanx/isoflow">Upstream GitHub</a> |
+  <a href="https://github.com/liljemery/isoflow-cloud">This fork</a> |
   <a href="https://discord.gg/QYPkvZth7D">Discord</a> |
   <a href="https://hub.docker.com/r/markmanx/isoflow/tags">Docker image</a>
 </h4>
@@ -18,6 +19,21 @@
 ![CircleCI](https://circleci.com/gh/markmanx/isoflow.svg?style=shield)
 
 </div>
+
+## About this fork (`isoflow-cloud`)
+
+**[isoflow-cloud](https://github.com/liljemery/isoflow-cloud)** is a **fork** of [Isoflow Community Edition](https://github.com/markmanx/isoflow) ([markmanx/isoflow](https://github.com/markmanx/isoflow)). It started as a personal clone of upstream and is maintained separately with additional fixes and features. This README describes both upstream Isoflow and what differs in this repository.
+
+### What this fork adds
+
+The following summarizes changes present in this fork’s history (not an exhaustive changelog):
+
+- **Containers & build** — Standalone webpack build for shipping the editor, a **Dockerfile** and docker-oriented webpack config, **pnpm**-aligned container scripts, and hardening around **model loading** in those environments.
+- **Editing & navigation** — **Zoom on scroll**, **expandable node labels**, showing the **grid in edit mode**, panning and **drag-and-drop** UX improvements, connector **direction** and **anchor** behavior, and smoother zoom/scroll/scene behavior (including fixes for first paint and resize).
+- **Export & model API** — Image export **grid toggle** and **background color**, higher-resolution image export, fixes for export edge cases (wrong view/scene, `cloneNode`, positioning, timestamps), **`deleteView`** reducer, **`lastUpdated`** on views, optional **`viewId`** in `initialData`, **model + view titles** in the UI, and broader **`standaloneExports`** / **validation schema** exports from the package.
+- **Docs & housekeeping** — README and copy updates, **lint** script fixes, and license year refresh.
+
+Issues **for this fork** belong on **[github.com/liljemery/isoflow-cloud/issues](https://github.com/liljemery/isoflow-cloud/issues)**. Upstream bugs and general Isoflow CE discussion remain on the **[official repository](https://github.com/markmanx/isoflow)**.
 
 ## About Isoflow Community Edition
 Isoflow is an open-core project. We offer the [Isoflow Community Edition](https://github.com/markmanx/isoflow) as fully-functional, open-source software under the MIT license.  In addition, we also support our development efforts by offering **Isoflow Pro** with additional features for commercial use.  You can read more about the differences between Pro and the Community Edition [here](https://isoflow.io/pro-vs-community-edition).
@@ -39,4 +55,4 @@ See our [documentation](https://isoflow.io/docs) for more information.
 For professional support, please consider purchasing a license for Isoflow Pro.  Isoflow Pro includes additional features and support options.  For more information, visit [isoflow.io](https://isoflow.io).
 
 ## Found a bug or need support?
-Please report bugs and issues [here](https://github.com/markmanx/isoflow/issues), or on our [Discord server](https://discord.gg/QYPkvZth7D).
+For **this fork**, open an issue on [isoflow-cloud](https://github.com/liljemery/isoflow-cloud/issues). For **upstream Isoflow CE**, use [markmanx/isoflow issues](https://github.com/markmanx/isoflow/issues), or ask on the [Discord server](https://discord.gg/QYPkvZth7D).
